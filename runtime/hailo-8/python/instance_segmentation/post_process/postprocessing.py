@@ -372,6 +372,12 @@ def yolov8_seg_postprocess(endnodes, device_pre_post_layers=None, **kwargs):
     outputs = []
 
     for b in range(batch_size):
+        num_detections = len(nms_res[b]["detection_boxes"])
+        if num_detections > 0:
+            print(f"DEBUG: Found {num_detections} detections above confidence threshold {score_thres}")
+            scores = nms_res[b]["detection_scores"]
+            print(f"DEBUG: Detection scores: {scores}")
+        
         protos = proto_data[b]
         protos = protos.astype(np.float32, copy=False)
         masks_in = nms_res[b]["mask"].astype(np.float32, copy=False)

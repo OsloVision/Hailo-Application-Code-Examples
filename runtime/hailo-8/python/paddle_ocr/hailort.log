@@ -1,0 +1,11 @@
+[2025-08-23 14:37:33.759] [19125] [HailoRT] [info] [vdevice.cpp:523] [create] Creating vdevice with params: device_count: 1, scheduling_algorithm: ROUND_ROBIN, multi_process_service: false
+[2025-08-23 14:37:33.771] [19125] [HailoRT] [info] [device.cpp:49] [Device] OS Version: Linux 6.12.25+rpt-rpi-2712 #1 SMP PREEMPT Debian 1:6.12.25-1+rpt1 (2025-04-30) aarch64
+[2025-08-23 14:37:33.773] [19125] [HailoRT] [info] [control.cpp:108] [control__parse_identify_results] firmware_version is: 4.20.0
+[2025-08-23 14:37:33.773] [19125] [HailoRT] [info] [vdevice.cpp:651] [create] VDevice Infos: 0001:01:00.0
+[2025-08-23 14:37:33.782] [19125] [HailoRT] [info] [hef.cpp:1929] [get_network_group_and_network_name] No name was given. Addressing all networks of default network_group: ocr_det
+[2025-08-23 14:37:33.782] [19125] [HailoRT] [info] [hef.cpp:1929] [get_network_group_and_network_name] No name was given. Addressing all networks of default network_group: ocr_det
+[2025-08-23 14:37:33.783] [19125] [HailoRT] [info] [hef.cpp:1929] [get_network_group_and_network_name] No name was given. Addressing all networks of default network_group: ocr_det
+[2025-08-23 14:37:33.783] [19125] [HailoRT] [error] [device_internal.cpp:602] [check_hef_is_compatible] HEF format is not compatible with device. Device arch: HAILO8L, HEF arch: HAILO8
+[2025-08-23 14:37:33.783] [19125] [HailoRT] [error] [vdevice.cpp:850] [create_local_config_params] CHECK_SUCCESS failed with status=HAILO_INVALID_HEF(26)
+[2025-08-23 14:37:33.783] [19125] [HailoRT] [error] [vdevice.cpp:693] [configure] CHECK_SUCCESS failed with status=HAILO_INVALID_HEF(26)
+[2025-08-23 14:37:33.783] [19125] [HailoRT] [error] [infer_model.cpp:349] [configure] CHECK_SUCCESS failed with status=HAILO_INVALID_HEF(26)

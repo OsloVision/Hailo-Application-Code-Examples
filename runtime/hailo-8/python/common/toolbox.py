@@ -297,20 +297,55 @@ def preprocess_from_cap(cap: cv2.VideoCapture, batch_size: int, input_queue: que
     """
     frames = []
     processed_frames = []
+    frame_count = 0
+
+    # Apply a limiter for live camera sources only (not for video files)
+    # Heuristic: live camera typically has CAP_PROP_FRAME_COUNT == 0
+    is_live_stream = int(cap.get(cv2.CAP_PROP_FRAME_COUNT) or 0) <= 0
+    desired_fps = 5.0  # target FPS for camera reads
+    frame_interval = 1.0 / desired_fps if desired_fps > 0 else 0.0
+    last_frame_time = 0.0
 
     while True:
         ret, frame = cap.read()
         if not ret:
             break
 
+        # Throttle reads for live camera to ~5 FPS
+        if is_live_stream and frame_interval > 0:
+            now = time.time()
+            if last_frame_time > 0:
+                delta = now - last_frame_time
+                if delta < frame_interval:
+                    time.sleep(frame_interval - delta)
+            last_frame_time = time.time()
+
+        frame_count += 1
         frames.append(frame)
         processed_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         processed_frame = preprocess_fn(processed_frame, width, height)
         processed_frames.append(processed_frame)
 
+        # Print queue status every 100 frames
+        if frame_count % 100 == 0:
+            queue_size = input_queue.qsize()
+            print(f"INFO: Processed {frame_count} frames, queue size: {queue_size}/100")
+
         if len(frames) == batch_size:
-            input_queue.put((frames, processed_frames))
-            processed_frames, frames = [], []
+            try:
+                input_queue.put((frames, processed_frames), block=False)
+                processed_frames, frames = [], []
+            except queue.Full:
+                # Queue is full, drop these frames and continue
+                print(f"WARNING: Input queue full, dropping {batch_size} frame(s)")
+                processed_frames, frames = [], []
+
+    # Handle any remaining frames at the end
+    if len(frames) > 0:
+        try:
+            input_queue.put((frames, processed_frames), block=False)
+        except queue.Full:
+            print(f"WARNING: Input queue full, dropping final {len(frames)} frame(s)")
 
 
 def preprocess_images(images: List[np.ndarray], batch_size: int, input_queue: queue.Queue, width: int, height: int,
@@ -383,9 +418,9 @@ def visualize(output_queue: queue.Queue, cap: cv2.VideoCapture, save_stream_outp
 
     if cap is not None:
         #Create a named window
-        cv2.namedWindow("Output", cv2.WND_PROP_FULLSCREEN)
+        # cv2.namedWindow("Output", cv2.WND_PROP_FULLSCREEN)
         #Set the window to fullscreen
-        cv2.setWindowProperty("Output", cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
+        # cv2.setWindowProperty("Output", cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
 
         if save_stream_output:
             # Read video dimensions
@@ -429,22 +464,14 @@ def visualize(output_queue: queue.Queue, cap: cv2.VideoCapture, save_stream_outp
 
         if cap is not None:
             # Display output
-            cv2.imshow("Output", frame_with_detections)
+            # cv2.imshow("Output", frame_with_detections)
             if save_stream_output:
                 out.write(frame_with_detections)
         else:
             cv2.imwrite(os.path.join(output_dir, f"output_{image_id}.png"), frame_with_detections)
 
-        # Wait for key press "q"
         image_id += 1
 
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            # Close the window and release the camera
-            if save_stream_output:
-                out.release()  # Release the VideoWriter object
-            cap.release()
-            cv2.destroyAllWindows()
-            break
 
     if cap is not None and save_stream_output:
         out.release()  # Release the VideoWriter object
