@@ -1,0 +1,19 @@
+[Unit]
+Description=Hailo Instance Segmentation Service
+After=network.target
+Wants=network.target
+
+[Service]
+Type=simple
+User=pyrat
+Group=pyrat
+WorkingDirectory=/home/pyrat/projects/Hailo-Application-Code-Examples/runtime/hailo-8/python/instance_segmentation
+Environment=PATH=/home/pyrat/segenv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+ExecStart=/home/pyrat/segenv/bin/python ./instance_segmentation.py -n /home/pyrat/yolov8s_seg.hef -i camera -a fast
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

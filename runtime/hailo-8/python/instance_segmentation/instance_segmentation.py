@@ -22,7 +22,7 @@ from typing import Tuple, Optional
 OCR_ENGINE = None  # type: Optional[object]
 
 # Minimum confidence to consider an OCR result "high confidence" for saving the crop
-OCR_SAVE_MIN_CONF = 0.7
+OCR_SAVE_MIN_CONF = 0.4
 
 def _sanitize_text_for_filename(text: str, max_len: int = 60) -> str:
     """Sanitize OCR text to be safe in filenames.

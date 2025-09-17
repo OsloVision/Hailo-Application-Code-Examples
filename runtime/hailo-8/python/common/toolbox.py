@@ -302,7 +302,7 @@ def preprocess_from_cap(cap: cv2.VideoCapture, batch_size: int, input_queue: que
     # Apply a limiter for live camera sources only (not for video files)
     # Heuristic: live camera typically has CAP_PROP_FRAME_COUNT == 0
     is_live_stream = int(cap.get(cv2.CAP_PROP_FRAME_COUNT) or 0) <= 0
-    desired_fps = 5.0  # target FPS for camera reads
+    desired_fps = 15  # target FPS for camera reads
     frame_interval = 1.0 / desired_fps if desired_fps > 0 else 0.0
     last_frame_time = 0.0
 

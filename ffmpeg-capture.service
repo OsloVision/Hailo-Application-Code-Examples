@@ -1,0 +1,19 @@
+[Unit]
+Description=FFmpeg Video Capture Service
+After=multi-user.target
+Wants=multi-user.target
+
+[Service]
+Type=simple
+User=pyrat
+WorkingDirectory=/home/pyrat
+ExecStartPre=/usr/bin/v4l2-ctl --set-ctrl=focus_automatic_continuous=0
+ExecStartPre=/usr/bin/v4l2-ctl --set-ctrl=focus_absolute=1
+ExecStart=/bin/bash -c '/usr/bin/ffmpeg -f v4l2 -input_format h264 -framerate 30 -video_size 1920x1080 -i /dev/video0 -c:v copy -f segment -segment_time 120 -segment_format mp4 -reset_timestamps 1 -strftime 1 /home/pyrat/output_%%Y%%m%%d_%%H%%M%%S.mp4'
+Restart=on-failure
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
