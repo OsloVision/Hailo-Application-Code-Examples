@@ -142,6 +142,37 @@ class HailoInfer:
             partial(inference_callback_fn, bindings_list=bindings_list)
         )
 
+    def run_sync(self, input_batch: List[np.ndarray]) -> List:
+        """
+        Run synchronous inference on a batch of preprocessed inputs.
+
+        Args:
+            input_batch (List[np.ndarray]): A batch of preprocessed model inputs.
+
+        Returns:
+            List: List of inference results for each input in the batch.
+        """
+        bindings_list = self.create_bindings(self.configured_model, input_batch)
+        
+        # Run synchronous inference with timeout (timeout as positional argument)
+        self.configured_model.run(bindings_list, 10000)
+        
+        # Extract results from bindings
+        results = []
+        for bindings in bindings_list:
+            if len(bindings._output_names) == 1:
+                result = bindings.output().get_buffer()
+            else:
+                result = {
+                    name: np.expand_dims(
+                        bindings.output(name).get_buffer(), axis=0
+                    )
+                    for name in bindings._output_names
+                }
+            results.append(result)
+        
+        return results
+
     def create_bindings(self, configured_model, input_batch):
         """
         Create a list of input-output bindings for a batch of frames.
