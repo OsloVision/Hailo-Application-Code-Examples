@@ -1,1 +1,3 @@
 runtime/hailo-8/python/instance_segmentation/output/
+__pycache__
+hailort.log
